@@ -299,8 +299,6 @@
     <script>
        
         
-       
-        let nextPostId = 3;
 
         // Tab functionality
         function showTab(tabName) {
