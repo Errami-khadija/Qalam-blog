@@ -38,6 +38,36 @@
                 }
             }
         }
+//#############//
+let currentPostId = null;
+
+function openDeleteModal(postId) {
+    currentPostId = postId;
+    const modal = document.getElementById('deleteModal');
+    const form = document.getElementById('deleteForm');
+    form.action = `/dashboard/posts/${postId}`;
+
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modal.classList.add('flex');
+        modal.classList.remove('opacity-0');
+        modal.classList.add('opacity-100');
+    }, 10);
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    modal.classList.remove('opacity-100');
+    modal.classList.add('opacity-0');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }, 300);
+}
+
+
+
+
     </script>
     <style>
         body {
@@ -45,6 +75,28 @@
         }
     </style>
 </head>
+
+
+ <!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 transition-opacity duration-300 ease-out opacity-0">
+  <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm text-center transform scale-95 transition-transform duration-300 ease-out">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Delete Post</h2>
+    <p class="text-gray-600 mb-6">Are you sure you want to delete this post? This action cannot be undone.</p>
+    <div class="flex justify-center space-x-4">
+      <button type="button" onclick="closeDeleteModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg transition-colors">
+        Cancel
+      </button>
+      <form id="deleteForm" method="POST" action="">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+          Delete
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <body class="bg-beige-50 font-sans">
     <!-- Header -->
     <header class="bg-brown-800 text-beige-50 shadow-lg">
@@ -101,32 +153,100 @@
                             </tr>
                         </thead>
                         <tbody id="posts-table">
-                           @foreach($posts as $post)
-        <tr class="border-b border-beige-100 hover:bg-beige-50">
-            <td class="py-3 px-4 text-brown-800">{{ $post->title }}</td>
-            <td class="py-3 px-4 text-brown-600">{{ $post->category ? $post->category->name : '-' }}</td>
-            <td class="py-3 px-4 text-brown-600">{{ $post->created_at->format('Y-m-d') }}</td>
-            <td class="py-3 px-4">
-                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
-                    {{ ucfirst($post->status) }}
-                </span>
-            </td>
-            <td class="py-3 px-4">
-                <a href="{{ route('posts.edit', $post->id) }}" 
-                   class="bg-beige-300 hover:bg-beige-400 text-brown-800 px-3 py-1 rounded mr-2 transition-colors">
-                    Edit
-                </a>
-                <form action="{{ route('posts.destroy', $post->id) }}" method="POST" class="inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit"
-                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition-colors"
-                        onclick="return confirm('Are you sure you want to delete this post?')">
-                        Delete
-                    </button>
-                </form>
-            </td>
-        </tr>
+                          
+        @foreach($posts as $post)
+<tr class="border-b border-beige-100 hover:bg-beige-50">
+    <td class="py-3 px-4 text-brown-800">{{ $post->title }}</td>
+    <td class="py-3 px-4 text-brown-600">{{ $post->category ? $post->category->name : '-' }}</td>
+    <td class="py-3 px-4 text-brown-600">{{ $post->created_at->format('Y-m-d') }}</td>
+    <td class="py-3 px-4">
+        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
+            {{ ucfirst($post->status) }}
+        </span>
+    </td>
+    <td class="py-3 px-4">
+        <!-- Open modal button -->
+    <button onclick="openEditModal({{ $post->id }})" 
+        class="bg-beige-300 hover:bg-beige-400 text-brown-800 px-3 py-1 rounded mr-2 transition-colors">
+    Edit
+</button>
+
+
+
+       <button type="button" onclick="openDeleteModal({{ $post->id }})"
+    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition-colors">
+    Delete
+</button>
+
+    </td>
+</tr>
+
+<!-- Edit Modal for this post -->
+<div id="edit-modal-{{ $post->id }}" 
+     class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 
+            opacity-0 transition-opacity duration-300 ease-out">
+
+    <div class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-brown-900">Edit Post</h3>
+         <button type="button" onclick="closeEditModal({{ $post->id }})" class="text-gray-500 hover:text-gray-700">
+
+
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+    </svg>
+</button>
+
+        </div>
+
+        <form action="{{ route('dashboard.posts.update', $post->id) }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            <div class="grid gap-4">
+                <div>
+                    <label class="block text-brown-700 font-medium mb-2">Title</label>
+                    <input type="text" name="title" value="{{ old('title', $post->title) }}" class="w-full px-4 py-2 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500" required>
+                </div>
+
+                <div>
+                    <label class="block text-brown-700 font-medium mb-2">Category</label>
+                    <select name="category_id" class="w-full px-4 py-2 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500">
+                        <option value="">Uncategorized</option>
+                        @foreach($categories as $c)
+                            <option value="{{ $c->id }}" @selected($post->category_id == $c->id)>{{ $c->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-brown-700 font-medium mb-2">Status</label>
+                    <select name="status" class="w-full px-4 py-2 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500">
+                        <option value="draft" @selected($post->status === 'draft')>Draft</option>
+                        <option value="published" @selected($post->status === 'published')>Published</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-brown-700 font-medium mb-2">Content</label>
+                    <textarea name="content" rows="8" class="w-full px-4 py-2 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500">{{ old('content', $post->content) }}</textarea>
+                </div>
+            </div>
+
+            <div class="flex gap-4 mt-6">
+                <button type="submit" class="bg-brown-600 hover:bg-brown-700 text-white px-6 py-2 rounded-lg transition-colors">
+                    Update Post
+                </button>
+           <button type="button" onclick="closeEditModal({{ $post->id }})" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors">
+    Cancel
+</button>
+
+
+            </div>
+        </form>
+    </div>
+</div>
+
         @endforeach
                            
                         </tbody>
@@ -200,101 +320,55 @@
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-2xl font-bold text-brown-900 mb-6">Create New Post</h2>
                 
-                <form onsubmit="savePost(event)">
+               <form action="{{ route('posts.store') }}" method="POST">
+               @csrf
                     <div class="grid gap-6">
-                        <div>
-                            <label class="block text-brown-700 font-medium mb-2">Post Title</label>
-                            <input type="text" id="post-title" class="w-full px-4 py-3 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent" placeholder="Enter post title..." required>
-                        </div>
-                        
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-brown-700 font-medium mb-2">Category</label>
-                                <select id="post-category" class="w-full px-4 py-3 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent">
-                                    <option value="Technology">Technology</option>
-                                    <option value="Lifestyle">Lifestyle</option>
-                                    <option value="Travel">Travel</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-brown-700 font-medium mb-2">Status</label>
-                                <select id="post-status" class="w-full px-4 py-3 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent">
-                                    <option value="draft">Draft</option>
-                                    <option value="published">Published</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-brown-700 font-medium mb-2">Content</label>
-                            <textarea id="post-content" rows="12" class="w-full px-4 py-3 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent" placeholder="Write your post content here..."></textarea>
-                        </div>
-                        
-                        <div class="flex gap-4">
-                            <button type="submit" class="bg-brown-600 hover:bg-brown-700 text-white px-8 py-3 rounded-lg transition-colors font-medium">
-                                Save Post
-                            </button>
-                            <button type="button" onclick="clearForm()" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-lg transition-colors font-medium">
-                                Clear
-                            </button>
-                        </div>
-                    </div>
-                </form>
+    <div>
+        <label class="block text-brown-700 font-medium mb-2">Post Title</label>
+        <input type="text" name="title" class="w-full px-4 py-3 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent" placeholder="Enter post title..." required>
+    </div>
+    
+    <div class="grid md:grid-cols-2 gap-4">
+        <div>
+            <label class="block text-brown-700 font-medium mb-2">Category</label>
+            <select name="category_id" class="w-full px-4 py-3 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent" required>
+                <option value="">Select a Category</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <label class="block text-brown-700 font-medium mb-2">Status</label>
+            <select name="status" class="w-full px-4 py-3 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent" required>
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+            </select>
+        </div>
+    </div>
+    
+    <div>
+        <label class="block text-brown-700 font-medium mb-2">Content</label>
+        <textarea name="content" rows="12" class="w-full px-4 py-3 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent" placeholder="Write your post content here..." required></textarea>
+    </div>
+    
+    <div class="flex gap-4">
+        <button type="submit" class="bg-brown-600 hover:bg-brown-700 text-white px-8 py-3 rounded-lg transition-colors font-medium">
+            Save Post
+        </button>
+        <button type="reset" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-lg transition-colors font-medium">
+            Clear
+        </button>
+    </div>
+</div>
+</form>
+
             </div>
         </div>
     </div>
 
-    <!-- Edit Post Modal -->
-    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-brown-900">Edit Post</h3>
-                <button onclick="closeEditModal()" class="text-gray-500 hover:text-gray-700">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            
-            <form onsubmit="updatePost(event)">
-                <input type="hidden" id="edit-post-id">
-                <div class="grid gap-4">
-                    <div>
-                        <label class="block text-brown-700 font-medium mb-2">Title</label>
-                        <input type="text" id="edit-post-title" class="w-full px-4 py-2 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent" required>
-                    </div>
-                    <div>
-                        <label class="block text-brown-700 font-medium mb-2">Category</label>
-                        <select id="edit-post-category" class="w-full px-4 py-2 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent">
-                            <option value="Technology">Technology</option>
-                            <option value="Lifestyle">Lifestyle</option>
-                            <option value="Travel">Travel</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-brown-700 font-medium mb-2">Status</label>
-                        <select id="edit-post-status" class="w-full px-4 py-2 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent">
-                            <option value="draft">Draft</option>
-                            <option value="published">Published</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-brown-700 font-medium mb-2">Content</label>
-                        <textarea id="edit-post-content" rows="8" class="w-full px-4 py-2 border border-beige-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent"></textarea>
-                    </div>
-                </div>
-                
-                <div class="flex gap-4 mt-6">
-                    <button type="submit" class="bg-brown-600 hover:bg-brown-700 text-white px-6 py-2 rounded-lg transition-colors">
-                        Update Post
-                    </button>
-                    <button type="button" onclick="closeEditModal()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors">
-                        Cancel
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+  
+
 
     <script>
        
@@ -322,95 +396,30 @@
             activeTab.classList.remove('bg-beige-200', 'text-brown-800', 'hover:bg-beige-300');
         }
 
-        // Post management
-        function editPost(postId) {
-            const post = posts.find(p => p.id === postId);
-            if (post) {
-                document.getElementById('edit-post-id').value = post.id;
-                document.getElementById('edit-post-title').value = post.title;
-                document.getElementById('edit-post-category').value = post.category;
-                document.getElementById('edit-post-status').value = post.status;
-                document.getElementById('edit-post-content').value = post.content;
-                document.getElementById('edit-modal').classList.remove('hidden');
-                document.getElementById('edit-modal').classList.add('flex');
-            }
-        }
+function openEditModal(id) {
+    const modal = document.getElementById(`edit-modal-${id}`);
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modal.classList.add('flex');
+        modal.classList.remove('opacity-0');
+        modal.classList.add('opacity-100');
+    }, 10); 
+}
 
-        function closeEditModal() {
-            document.getElementById('edit-modal').classList.add('hidden');
-            document.getElementById('edit-modal').classList.remove('flex');
-        }
+function closeEditModal(id) {
+    const modal = document.getElementById(`edit-modal-${id}`);
+    modal.classList.remove('opacity-100');
+    modal.classList.add('opacity-0');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }, 300); 
+}
 
-        function updatePost(event) {
-            event.preventDefault();
-            const postId = parseInt(document.getElementById('edit-post-id').value);
-            const postIndex = posts.findIndex(p => p.id === postId);
-            
-            if (postIndex !== -1) {
-                posts[postIndex] = {
-                    ...posts[postIndex],
-                    title: document.getElementById('edit-post-title').value,
-                    category: document.getElementById('edit-post-category').value,
-                    status: document.getElementById('edit-post-status').value,
-                    content: document.getElementById('edit-post-content').value
-                };
-                
-                renderPosts();
-                closeEditModal();
-                alert('Post updated successfully!');
-            }
-        }
+         
 
-        function deletePost(postId) {
-            if (confirm('Are you sure you want to delete this post?')) {
-                posts = posts.filter(p => p.id !== postId);
-                renderPosts();
-                alert('Post deleted successfully!');
-            }
-        }
 
-        function savePost(event) {
-            event.preventDefault();
-            const newPost = {
-                id: nextPostId++,
-                title: document.getElementById('post-title').value,
-                category: document.getElementById('post-category').value,
-                status: document.getElementById('post-status').value,
-                content: document.getElementById('post-content').value,
-                date: new Date().toISOString().split('T')[0]
-            };
-            
-            posts.unshift(newPost);
-            renderPosts();
-            clearForm();
-            alert('Post saved successfully!');
-            showTab('posts');
-        }
-
-        function clearForm() {
-            document.getElementById('post-title').value = '';
-            document.getElementById('post-content').value = '';
-            document.getElementById('post-category').selectedIndex = 0;
-            document.getElementById('post-status').selectedIndex = 0;
-        }
-
-        function renderPosts() {
-            const tbody = document.getElementById('posts-table');
-            tbody.innerHTML = posts.map(post => `
-                <tr class="border-b border-beige-100 hover:bg-beige-50">
-                    <td class="py-3 px-4 text-brown-800">${post.title}</td>
-                    <td class="py-3 px-4 text-brown-600">${post.category}</td>
-                    <td class="py-3 px-4 text-brown-600">${post.date}</td>
-                    <td class="py-3 px-4">
-                        <span class="px-2 py-1 rounded-full text-sm ${post.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${post.status.charAt(0).toUpperCase() + post.status.slice(1)}</span>
-                    </td>
-                    <td class="py-3 px-4">
-                        <button onclick="editPost(${post.id})" class="bg-beige-300 hover:bg-beige-400 text-brown-800 px-3 py-1 rounded mr-2 transition-colors">Edit</button>
-                        <button onclick="deletePost(${post.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition-colors">Delete</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
+       
 
         // Category management
         function showAddCategoryForm() {

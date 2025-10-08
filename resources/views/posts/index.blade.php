@@ -529,15 +529,19 @@
 
             <!-- Blog Posts Grid -->
             <section class="blog-grid">
+                 @foreach($posts as $post)
                 <article class="blog-card">
-                    <span class="blog-category">Illuminated</span>
-                    <h2 class="blog-title">The Art of Medieval Manuscripts</h2>
-                    <p class="blog-excerpt">Explore the intricate world of medieval illuminated manuscripts, where skilled scribes and artists created masterpieces that have survived centuries. These sacred texts reveal the dedication and artistry of ancient craftsmen who preserved knowledge through the ages.</p>
+                    
+                    <span class="blog-category">{{ $post->category ? $post->category->name : '-' }}</span>
+                    <h2 class="blog-title">{{ $post->title }}</h2>
+                    <p class="blog-excerpt">{{ $post->content }}</p>
                     <div class="blog-meta">
-                        <span>Anno Domini MMXXIV</span>
+                        <span>created at : {{ $post->created_at->format('Y-m-d') }}</span>
                         <a href="#" class="read-more">Continue Reading</a>
                     </div>
+                    
                 </article>
+                  @endforeach
 
                 
             </section>
