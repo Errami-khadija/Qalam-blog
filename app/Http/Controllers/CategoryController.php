@@ -27,11 +27,12 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
-    }
-
+ public function store(Request $request)
+{
+    $request->validate(['name' => 'required|string|max:255']);
+    Category::create(['name' => $request->name]);
+    return redirect()->back()->with('success', 'Category added successfully!');
+}
     /**
      * Display the specified resource.
      */
@@ -57,16 +58,16 @@ class CategoryController extends Controller
         $request->validate(['name' => 'required|string|max:255']);
         $category = Category::findOrFail($id);
         $category->update(['name' => $request->name]);
-        return redirect()->route('categories.index')->with('success', 'Category updated.');
+        return redirect()->route('dashboard.home')->with('success', 'Category updated.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-         $category = Category::findOrFail($id);
-        $category->delete();
-        return redirect()->route('categories.index')->with('success', 'Category deleted.');
-    }
+public function destroy($id)
+{
+    $category = Category::findOrFail($id);
+    $category->delete();
+    return redirect()->back()->with('success', 'Category deleted successfully!');
+}
 }

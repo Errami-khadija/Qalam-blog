@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Art of Slow Living - Vintage Blog</title>
+    <title>Qalam blog</title>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <style>
         body {
@@ -376,6 +376,9 @@
     </style>
 </head>
 <body>
+ 
+
+
     <!-- Floating particles -->
     <div class="bg-particles">
         <div class="particle"><div class="ink-drop"></div></div>
@@ -397,32 +400,21 @@
         </div>
     </nav>
 
+
+
     <!-- Main content -->
     <div class="book-container">
         <article class="article-content">
             <header class="article-header">
-                <h1 class="article-title">The Art of Slow Living</h1>
-                <div class="article-meta">By Eleanor Whitmore</div>
-                <div class="article-date">Published on March 15, 2024</div>
+                <h1 class="article-title">{{ $post->title }}</h1>
+                <div class="article-meta">By Errami Khadija</div>
+                <div class="article-date">Published on {{ $post->created_at->format('F j, Y') }}</div>
             </header>
 
             <div class="article-body">
-                <p>In our increasingly fast-paced world, the concept of slow living has emerged as a gentle rebellion against the tyranny of constant motion. It is not merely about moving at a leisurely pace, but rather about cultivating a mindful approach to existence that honors both our inner rhythms and the natural world around us.</p>
-
-                <p>The philosophy of slow living invites us to question the modern obsession with productivity and efficiency. Instead of rushing through our days in a blur of activities, we learn to savor each moment, to find beauty in the mundane, and to appreciate the subtle textures of daily life.</p>
-
-                <div class="quote">
-                    The art of living slowly is the art of living fully, where each breath becomes a meditation and each step a prayer.
-                </div>
-
-                <p>Consider the simple act of preparing tea. In our hurried world, we might microwave water and steep a bag for mere minutes. But the slow living approach transforms this into a ritual: selecting leaves with care, heating water to the perfect temperature, watching steam rise like incense, and finally, sitting in quiet contemplation as we sip.</p>
-
-                <p>This mindful approach extends beyond individual moments to encompass our relationships, our work, and our connection to the seasons. We begin to notice the way morning light changes throughout the year, the subtle shift in our garden's rhythm, the deeper conversations that emerge when we're not constantly checking our devices.</p>
-
-                <p>Slow living is not about privilege or having endless free time. It's about making conscious choices within whatever circumstances we find ourselves. It's about quality over quantity, depth over breadth, and presence over productivity.</p>
-
-                <p>As we embrace this gentler way of being, we discover that life becomes richer, not poorer. We find that by doing less, we experience more. In the space between our breaths, in the pause between our thoughts, we find the profound peace that has always been waiting for us.</p>
+                <p>{!! nl2br(e($post->content)) !!}</p>
             </div>
+
 
             <!-- Comments Section -->
             <section class="comments-section">

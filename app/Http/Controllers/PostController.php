@@ -56,10 +56,12 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-         return view('posts.show', compact('post'));
-    }
+   public function show($id)
+{
+    $post = Post::with('category')->findOrFail($id);
+    return view('posts/post', compact('post'));
+}
+
 
     /**
      * Show the form for editing the specified resource.

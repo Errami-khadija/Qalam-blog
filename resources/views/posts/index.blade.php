@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qalam Blog - Ancient Chronicles</title>
+    <title>Qalam Blog </title>
     <style>
         body {
             box-sizing: border-box;
@@ -536,8 +536,9 @@
                     <h2 class="blog-title">{{ $post->title }}</h2>
                     <p class="blog-excerpt">{{ $post->content }}</p>
                     <div class="blog-meta">
-                        <span>created at : {{ $post->created_at->format('Y-m-d') }}</span>
-                        <a href="#" class="read-more">Continue Reading</a>
+                        <span>Published on : {{ $post->created_at->format('Y-m-d') }}</span>
+                        <a href="{{ route('posts.show', $post->id) }}" class="read-more">Continue Reading</a>
+
                     </div>
                     
                 </article>

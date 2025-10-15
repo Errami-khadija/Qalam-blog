@@ -1,44 +1,50 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\Admin\PostController as AdminPostController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
+| Here is where you can register web routes for your application.
+| These routes are loaded by the RouteServiceProvider and assigned
+| to the "web" middleware group.
+|--------------------------------------------------------------------------
 */
 
-use App\Http\Controllers\PostController;
-use App\Http\Controllers\CategoryController;
-
-use App\Http\Controllers\Admin\PostController as AdminPostController;
-
-Route::prefix('dashboard')->name('dashboard.')->group(function () {
-    Route::get('/', [AdminPostController::class, 'dashboard'])->name('home'); // dashboard homepage
-    Route::resource('posts', AdminPostController::class);
-});
-
-Route::get('/', [PostController::class, 'index']); // homepage = blog posts
-
+// --------------------
+// Public Routes
+// --------------------
+Route::get('/', [PostController::class, 'index'])->name('home');
 Route::resource('posts', PostController::class);
 Route::resource('categories', CategoryController::class);
 
-
-
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
-
+// --------------------
+// Authenticated User Routes
+// --------------------
 Route::middleware('auth')->group(function () {
+    // Profile management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+// --------------------
+// Admin Dashboard Routes
+// --------------------
+Route::prefix('dashboard')
+    ->name('dashboard.')
+    ->middleware(['auth', 'verified']) 
+    ->group(function () {
+        Route::get('/', [AdminPostController::class, 'dashboard'])->name('home');
+        Route::resource('posts', AdminPostController::class);
+    });
+
+// --------------------
+// Authentication Routes
+// --------------------
+require __DIR__ . '/auth.php';
