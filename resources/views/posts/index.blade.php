@@ -439,6 +439,39 @@
             transform: translateX(5px);
         }
 
+    .pagination {
+    display: flex;
+    justify-content: center;
+    margin: 3rem 0;
+    gap: 1rem;
+}
+
+.pagination .page-link,
+.pagination span {
+    color: #8B4513;
+    border: 2px solid #8B4513;
+    padding: 0.6rem 1rem;
+    text-decoration: none;
+    font-weight: bold;
+    font-family: 'Cinzel', serif;
+    background: #F4F1E8;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    background: #8B4513;
+    color: #F4F1E8;
+}
+
+.pagination .active span {
+    background: #8B4513;
+    color: #F4F1E8;
+    border-color: #8B4513;
+}
+
+
+
+
         /* Footer - Book End */
         .footer {
             position: relative;
@@ -544,9 +577,13 @@
                     
                 </article>
                   @endforeach
-
-                
+     
             </section>
+
+             <!-- Pagination Links -->
+              <div class="pagination">
+               {!! $posts->links() !!}
+              </div>
         </main>
 
         <!-- Footer -->

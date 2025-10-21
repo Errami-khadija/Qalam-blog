@@ -23,8 +23,8 @@ class PostController extends Controller
     {
        
 
-     $posts = Post::with('category')->get(); // eager load category
-        return view('posts.index', compact('posts'));
+     $posts = Post::with('category')->orderBy('created_at')->paginate(3);
+    return view('posts.index', compact('posts'));
     }
 
     /**
