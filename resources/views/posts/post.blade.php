@@ -390,12 +390,12 @@
     <!-- Navigation -->
     <nav class="nav-bar">
         <div class="nav-content">
-            <a href="#" class="logo">📜 Vintage Chronicles</a>
+            <a href="{{ route('home') }}" class="logo">📜 Qalam blog</a>
             <ul class="nav-links">
-                <li><a href="#">Home</a></li>
+                <li><a href="{{ route('home') }}">Home</a></li>
                 <li><a href="#">Articles</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a  href="{{ route('about') }}">About</a></li>
+                <li><a href="{{ route('contact') }}">Contact</a></li>
             </ul>
         </div>
     </nav>
@@ -420,35 +420,37 @@
             <section class="comments-section">
                 <h2 class="comments-title">Share Your Thoughts</h2>
                 
-                <form class="comment-form" onsubmit="addComment(event)">
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="comment">Your Comment</label>
-                        <textarea id="comment" name="comment" rows="4" required></textarea>
-                    </div>
-                    <button type="submit" class="submit-btn">Post Comment</button>
-                </form>
+               <form class="comment-form" action="{{ route('comments.store', $post->id) }}" method="POST">
+    @csrf
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required>
+    </div>
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+    </div>
+    <div class="form-group">
+        <label for="comment">Your Comment</label>
+        <textarea id="comment" name="content" rows="4" required></textarea>
+    </div>
+    <button type="submit" class="submit-btn">Post Comment</button>
+</form>
 
-                <div class="existing-comments" id="comments-list">
-                    <div class="comment">
-                        <div class="comment-author">Margaret Thompson</div>
-                        <div class="comment-date">March 16, 2024 at 2:30 PM</div>
-                        <div class="comment-text">This article beautifully captures what I've been feeling lately. The tea ritual example really resonated with me - I'm going to try implementing that tomorrow morning.</div>
-                    </div>
-                    
-                    <div class="comment">
-                        <div class="comment-author">James Chen</div>
-                        <div class="comment-date">March 16, 2024 at 4:15 PM</div>
-                        <div class="comment-text">Eleanor's writing always brings such peace to my day. The idea that slow living isn't about privilege but about conscious choices is so important. Thank you for this reminder.</div>
-                    </div>
-                </div>
+@if(session('success'))
+    <p style="color: green; text-align:center;">{{ session('success') }}</p>
+@endif
+
+<div class="existing-comments" id="comments-list">
+    @foreach($post->comments as $comment)
+        <div class="comment">
+            <div class="comment-author">{{ $comment->name }}</div>
+            <div class="comment-date">{{ $comment->created_at->format('F j, Y \a\t g:i A') }}</div>
+            <div class="comment-text">{{ $comment->content }}</div>
+        </div>
+    @endforeach
+</div>
+
             </section>
         </article>
     </div>

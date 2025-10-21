@@ -5,6 +5,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Admin\PostController as AdminPostController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ContactController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +24,15 @@ use App\Http\Controllers\Admin\PostController as AdminPostController;
 Route::get('/', [PostController::class, 'index'])->name('home');
 Route::resource('posts', PostController::class);
 Route::resource('categories', CategoryController::class);
+Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+Route::get('/about', function () {
+    return view('posts.about');
+})->name('about');
+Route::get('/contact', function () {
+    return view('posts.contact');
+})->name('contact');
+Route::post('/contact', [ContactController::class, 'sendMessage'])->name('contact.send');
+
 
 // --------------------
 // Authenticated User Routes

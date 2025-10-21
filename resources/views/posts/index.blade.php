@@ -506,17 +506,18 @@
     <div class="book-container">
         <!-- Header - Title Page -->
         <header class="header">
-            <a href="#" class="logo">📜 Qalam</a>
+            <a href="{{ route('home') }}" class="logo">📜 Qalam blog</a>
             <p class="subtitle">Where Words Come Alive</p>
-            <nav>
-                <ul class="nav-menu">
-                    <li><a href="#" class="nav-link">Home</a></li>
-                    <li><a href="#" class="nav-link">Blog</a></li>
-                    <li><a href="#" class="nav-link">categories</a></li>
-                    <li><a href="#" class="nav-link">About</a></li>
-                    <li><a href="#" class="nav-link">Contact</a></li>
-                </ul>
-            </nav>
+           <!-- Navigation -->
+        <nav class="nav-container">
+            <div class="nav-links">
+                <a href="{{ route('home') }}" class="nav-link active">Home</a>
+                <a href="#" class="nav-link">Articles</a>
+                <a href="#" class="nav-link">Categories</a>
+                <a href="{{ route('about') }}" class="nav-link">About</a>
+                <a href="{{ route('contact') }}" class="nav-link">Contact</a>
+            </div>
+        </nav>
         </header>
 
         <!-- Main Content -->
